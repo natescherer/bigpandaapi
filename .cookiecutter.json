@@ -1,0 +1,15 @@
+{
+  "_output_dir": "/workspaces/bigpandaapi",
+  "_repo_dir": "/home/vscode/.cookiecutters/cookiecutter-hypermodern-python",
+  "_template": "gh:cjolowicz/cookiecutter-hypermodern-python",
+  "author": "Nate Scherer",
+  "copyright_year": "2023",
+  "development_status": "Development Status :: 3 - Alpha",
+  "email": "pypi@nate.online",
+  "friendly_name": "The Unofficial BigPanda API Python Library",
+  "github_user": "natescherer",
+  "license": "MIT",
+  "package_name": "bigpandaapi",
+  "project_name": "bigpandaapi",
+  "version": "0.0.0"
+}
