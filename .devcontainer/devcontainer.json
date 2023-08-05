@@ -1,19 +1,19 @@
 {
-    "name": "sre-devcontainer",
-    "image": "ghcr.io/natescherer/sre-devcontainer:latest",
-    "remoteUser": "vscode",
-    "customizations": {
+  "name": "sre-devcontainer",
+  "image": "ghcr.io/natescherer/sre-devcontainer:latest",
+  "remoteUser": "vscode",
+  "customizations": {
     "vscode": {
-        "extensions": [
-            "ms-python.python",
-            "ms-python.isort",
-            "ms-python.flake8",
-            "ms-python.black-formatter",
-            "streetsidesoftware.code-spell-checker",
-            "shyykoserhiy.git-autoconfig",
-            "eamodio.gitlens",
-            "tamasfe.even-better-toml"
-        ]
+      "extensions": [
+        "ms-python.python",
+        "ms-python.isort",
+        "ms-python.flake8",
+        "ms-python.black-formatter",
+        "streetsidesoftware.code-spell-checker",
+        "shyykoserhiy.git-autoconfig",
+        "eamodio.gitlens",
+        "tamasfe.even-better-toml"
+      ]
     }
-}
+  }
 }

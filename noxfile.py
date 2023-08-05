@@ -149,7 +149,13 @@ def safety(session: Session) -> None:
 @session(python=python_versions)
 def mypy(session: Session) -> None:
     """Type-check using mypy."""
-    args = session.posargs or ["src", "tests", "docs/conf.py", "--install-types", "--non-interactive"]
+    args = session.posargs or [
+        "src",
+        "tests",
+        "docs/conf.py",
+        "--install-types",
+        "--non-interactive",
+    ]
     session.install(".")
     session.install("mypy", "pytest")
     session.run("mypy", *args)

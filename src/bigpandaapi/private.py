@@ -5,7 +5,8 @@ This module contains the set of bigpandaapi's private functions and classes.
 
 import csv
 import io
-from typing import Dict, List
+from typing import Dict
+from typing import List
 
 
 def _list_of_dicts_to_csv_str(input_list: List[Dict[str, str]]) -> str:
@@ -33,8 +34,9 @@ def _list_of_dicts_to_csv_str(input_list: List[Dict[str, str]]) -> str:
         writer = csv.DictWriter(
             csv_string,
             fieldnames=sorted_fieldnames,
-            extrasaction='ignore',
-            dialect="unix")
+            extrasaction="ignore",
+            dialect="unix",
+        )
         writer.writeheader()
         writer.writerows(input_list)
         return csv_string.getvalue()

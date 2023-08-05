@@ -12,15 +12,24 @@ Typical usage example:
 
 import json
 import time
-from typing import Dict, List, Optional
+from typing import Dict
+from typing import List
+from typing import Optional
+
 import requests
+
 from .exceptions import BigPandaAPIException
 from .private import _list_of_dicts_to_csv_str
+
 
 __base_uri: str = "https://api.bigpanda.io/resources/v2.1"
 
 
-def mapping_update_table(input_list: List[Dict[str, str]], enrichment_name: str, api_key: str, ) -> None:
+def mapping_update_table(
+    input_list: List[Dict[str, str]],
+    enrichment_name: str,
+    api_key: str,
+) -> None:
     """Updates a BigPanda Mapping Enrichment Table.
 
     Takes a list of dicts and updates an existing BigPanda Mapping Enrichment
@@ -38,15 +47,17 @@ def mapping_update_table(input_list: List[Dict[str, str]], enrichment_name: str,
     """
     # Construct session
     bp_session = requests.Session()
-    bp_session.hooks = {"response": lambda r,
-                        *args, **kwargs: r.raise_for_status()}
+    bp_session.hooks = {"response": lambda r, *args, **kwargs: r.raise_for_status()}
     bp_session.headers.update({"Authorization": f"Bearer {api_key}"})
 
     # Get the internal ID of the mapping enrichment based on the name
     print("Getting mapping ID from BigPanda...")
     r_id = bp_session.get(f"{__base_uri}/mapping-enrichment")
-    mapping_enrichment = next((item for item in r_id.json()["data"]
-                               if item["config"]["name"] == enrichment_name))
+    mapping_enrichment = next(
+        item
+        for item in r_id.json()["data"]
+        if item["config"]["name"] == enrichment_name
+    )
     mapping_id = mapping_enrichment["id"]
     print(f"Enrichment {enrichment_name} has id {mapping_id}.")
 
@@ -54,17 +65,18 @@ def mapping_update_table(input_list: List[Dict[str, str]], enrichment_name: str,
     r_upload = bp_session.post(
         f"{__base_uri}/mapping-enrichment/{mapping_id}/map",
         headers={"Content-Type": "text/csv; charset=utf8"},
-        data=_list_of_dicts_to_csv_str(input_list).encode("UTF-8"))
+        data=_list_of_dicts_to_csv_str(input_list).encode("UTF-8"),
+    )
     try:
         job_id = r_upload.json()["job_id"]
     except KeyError as exc:
         raise BigPandaAPIException(
-            "Job ID not returned by upload to BigPanda.") from exc
+            "Job ID not returned by upload to BigPanda."
+        ) from exc
     while True:
         print("Waiting 5 seconds for upload to process...")
         time.sleep(5)
-        r_status = bp_session.get(
-            f"{__base_uri}/alert-enrichments-jobs/{job_id}")
+        r_status = bp_session.get(f"{__base_uri}/alert-enrichments-jobs/{job_id}")
         if r_status.json()["status"] == "done" or r_status.json()["status"] == "failed":
             break
 
@@ -75,7 +87,9 @@ def mapping_update_table(input_list: List[Dict[str, str]], enrichment_name: str,
         raise BigPandaAPIException(f"Upload with job ID {job_id} failed!")
 
 
-def mapping_create_schema(query_tag: str, result_tag: str, api_key: str, enrichment_name: Optional[str] = None) -> None:
+def mapping_create_schema(
+    query_tag: str, result_tag: str, api_key: str, enrichment_name: Optional[str] = None
+) -> None:
     """Creates the schema for a new BigPanda Mapping Enrichment.
 
     Creates the schema for a new BigPanda Mapping Enrichment. This must be done
@@ -101,33 +115,26 @@ def mapping_create_schema(query_tag: str, result_tag: str, api_key: str, enrichm
         "active": True,
         "when": "discard != true",
         "config": {
-                "name": result_tag,
+            "name": result_tag,
             "fields": [
-                {
-                    "title": query_tag,
-                    "type": "query_tag"
-                },
-                {
-                    "title": result_tag,
-                    "type": "result_tag",
-                    "override_existing": True
-                }
-            ]
-        }
+                {"title": query_tag, "type": "query_tag"},
+                {"title": result_tag, "type": "result_tag", "override_existing": True},
+            ],
+        },
     }
 
     print("Creating enrichment...")
     bp_session = requests.Session()
-    bp_session.hooks = {"response": lambda r,
-                        *args, **kwargs: r.raise_for_status()}
+    bp_session.hooks = {"response": lambda r, *args, **kwargs: r.raise_for_status()}
     bp_session.headers.update({"Content-Type": "application/json"})
     bp_session.headers.update({"Authorization": f"Bearer {api_key}"})
 
     try:
         bp_session.post(
-            f"{__base_uri}/mapping-enrichment",
-            data=json.dumps(mapping_config))
+            f"{__base_uri}/mapping-enrichment", data=json.dumps(mapping_config)
+        )
     except requests.RequestException as exc:
         raise BigPandaAPIException(
-            "Creation of mapping enrichment schema failed.") from exc
+            "Creation of mapping enrichment schema failed."
+        ) from exc
     print("Done!")
