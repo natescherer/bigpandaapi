@@ -1,115 +1,45 @@
-# Contributor Guide
+# Introduction
 
-Thank you for your interest in improving this project.
-This project is open-source under the [MIT license] and
-welcomes contributions in the form of bug reports, feature requests, and pull requests.
+Thanks for considering contributing to this project! My name is Nate Scherer, and I'm excited you're interested in improving something I've written.
 
-Here is a list of important resources for contributors:
+I'm happy to consider any contributions, especially ones that add functionality or fix bugs.
 
-- [Source Code]
-- [Documentation]
-- [Issue Tracker]
-- [Code of Conduct]
+## Ground Rules
 
-[mit license]: https://opensource.org/licenses/MIT
-[source code]: https://github.com/natescherer/bigpandaapi
-[documentation]: https://bigpandaapi.readthedocs.io/
-[issue tracker]: https://github.com/natescherer/bigpandaapi/issues
+I really only have one rule for contributions:
+
+> This project is licensed under The MIT License, so your contribution will need to use the same license in order to be accepted.
+
+If I accept your contribution, I'll add you to the Authors section in the README.
+
+## How to Contribute
+
+For contributions, please fork this project, make the changes/additions, and then issue a Pull Request.
+Never done a pull request before? There's an easy tutorial [here](http://makeapullrequest.com/).
 
 ## How to report a bug
 
-Report bugs on the [Issue Tracker].
+### Vulnerabilities
 
-When filing an issue, make sure to answer these questions:
+If you find a security vulnerability, please do NOT open an Issue. Instead, see [SECURITY.md](SECURITY.md)
 
-- Which operating system and Python version are you using?
-- Which version of this project are you using?
-- What did you do?
-- What did you expect to see?
-- What did you see instead?
+### Non-Security Bugs
 
-The best way to get your bug fixed is to provide a test case,
-and/or steps to reproduce the issue.
+For non-security bugs, please search GitHub issues to make sure someone else hasn't already reported the issue, and, if not, open an issue with the "bug" label containing the following information:
 
-## How to request a feature
+> 1. What release are you using?
+> 1. What did you do?
+> 1. What did you expect to see?
+> 1. What did you see instead?
 
-Request features on the [Issue Tracker].
+## How to suggest a feature or enhancement
 
-## How to set up your development environment
+If you wish to suggest a feature or enhancement, please search GitHub issues to make sure someone else hasn't already made the request, and, if not, enter an issue with the "enhancement" label.
 
-You need Python 3.7+ and the following tools:
+## Code review process
 
-- [Poetry]
-- [Nox]
-- [nox-poetry]
+As I'm just one person, and my GitHub projects are a side-project to my normal job, it may take me a while to review.
 
-Install the package with development requirements:
+## Questions
 
-```console
-$ poetry install
-```
-
-You can now run an interactive Python session,
-or the command-line interface:
-
-```console
-$ poetry run python
-$ poetry run bigpandaapi
-```
-
-[poetry]: https://python-poetry.org/
-[nox]: https://nox.thea.codes/
-[nox-poetry]: https://nox-poetry.readthedocs.io/
-
-## How to test the project
-
-Run the full test suite:
-
-```console
-$ nox
-```
-
-List the available Nox sessions:
-
-```console
-$ nox --list-sessions
-```
-
-You can also run a specific Nox session.
-For example, invoke the unit test suite like this:
-
-```console
-$ nox --session=tests
-```
-
-Unit tests are located in the _tests_ directory,
-and are written using the [pytest] testing framework.
-
-[pytest]: https://pytest.readthedocs.io/
-
-## How to submit changes
-
-Open a [pull request] to submit changes to this project.
-
-Your pull request needs to meet the following guidelines for acceptance:
-
-- The Nox test suite must pass without errors and warnings.
-- Include unit tests. This project maintains 100% code coverage.
-- If your changes add functionality, update the documentation accordingly.
-
-Feel free to submit early, though—we can always iterate on this.
-
-To run linting and code formatting checks before committing your change, you can install pre-commit as a Git hook by running the following command:
-
-```console
-$ nox --session=pre-commit -- install
-```
-
-It is recommended to open an issue before starting work on anything.
-This will allow a chance to talk it over with the owners and validate your approach.
-
-[pull request]: https://github.com/natescherer/bigpandaapi/pulls
-
-<!-- github-only -->
-
-[code of conduct]: CODE_OF_CONDUCT.md
+If you have additional questions about contributing, please open a GitHub issue with the "question" tag.

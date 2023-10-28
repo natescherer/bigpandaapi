@@ -2,6 +2,7 @@
   "name": "sre-devcontainer",
   "image": "ghcr.io/natescherer/sre-devcontainer:latest",
   "remoteUser": "vscode",
+  "features": {},
   "customizations": {
     "vscode": {
       "extensions": [
