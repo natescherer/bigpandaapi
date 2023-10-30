@@ -1,0 +1,78 @@
+"""Functions for BigPanda Open Integration Manager (OIM) alerts.
+
+This implements functions that abstract the OIM alert features of BigPanda's API.
+
+Typical usage example:
+
+  properties = {
+    "host": "HostName",
+    "check": "CheckName",
+    "description": "This is a description."
+  }
+  bigpandaapi.oim_send_alert(app_key=app_key,
+                              org_token=org_token,
+                              properties=properties)
+"""
+
+import datetime
+import json
+from typing import Dict
+from typing import Optional
+
+import requests
+from dateutil import parser as dateutilparser
+
+from .exceptions import BigPandaAPIException
+
+
+__base_uri: str = "https://integrations.bigpanda.io/oim/api"
+
+
+def oim_send_alert(
+    app_key: str,
+    org_token: str,
+    properties: Dict,
+    status: str = "warning",
+    timestamp: Optional[datetime.datetime] = None,
+) -> None:
+    """Sends an alert to a BigPanda OIM Integration.
+
+    Sends an alert to a BigPanda Open Integration Manager (OIM) integration.
+
+    Args:
+        app_key: The App Key for the OIM integration to which you'd like to send the
+            alert.
+        org_token: The token for the BigPanda org that the OIM integration is a part
+            of. This is also referred to as the Auth Token in the BigPanda UI.
+        properties: A dict of values that will be sent in the body of the alert. Each
+            key-value pair will be parsed as a tag on the alert in BigPanda.
+        timestamp: An optional datetime for the alert. If excluded, BigPanda will use
+            the datetime when it receives the alert payload. ISO 8601 format is
+            recommended, and UTC will be assumed as the timezone if not specified.
+
+    Raises:
+        BigPandaAPIException: This shouldn't error unless you provide malformed input.
+    """
+    valid_statuses = {"ok", "critical", "warning", "acknowledged"}
+    if status not in valid_statuses:
+        raise ValueError("Status must be one of %r." % valid_statuses)
+
+    body = {
+        "app_key": app_key,
+        "status": status,
+    }
+    body = {**body, **properties}
+    if timestamp:
+        body["timestamp"] = dateutilparser.parse(timestamp).timestamp()
+
+    print("Sending OIM alert...")
+    bp_session = requests.Session()
+    bp_session.hooks = {"response": lambda r, *args, **kwargs: r.raise_for_status()}
+    bp_session.headers.update({"Content-Type": "application/json"})
+    bp_session.headers.update({"Authorization": f"Bearer {org_token}"})
+
+    try:
+        bp_session.post(f"{__base_uri}/alerts", data=json.dumps(body))
+    except requests.RequestException as exc:
+        raise BigPandaAPIException("Sending alert failed.") from exc
+    print("Done!")
