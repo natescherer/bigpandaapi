@@ -14,13 +14,15 @@ Typical usage example:
                               properties=properties)
 """
 
-import datetime
+from __future__ import annotations  # TypedDict NotRequired Support for <3.10
+
 import json
-from typing import Dict
-from typing import Optional
+from typing import Mapping
 
 import requests
-from dateutil import parser as dateutilparser
+from dateutil import parser
+from typing_extensions import NotRequired  # TypedDict NotRequired Support for <3.11
+from typing_extensions import TypedDict  # TypedDict NotRequired Support for <3.11
 
 from .exceptions import BigPandaAPIException
 
@@ -31,9 +33,9 @@ __base_uri: str = "https://integrations.bigpanda.io/oim/api"
 def oim_send_alert(
     app_key: str,
     org_token: str,
-    properties: Dict,
+    properties: Mapping[str, str],
     status: str = "warning",
-    timestamp: Optional[datetime.datetime] = None,
+    timestamp: str | None = None,
 ) -> None:
     """Sends an alert to a BigPanda OIM Integration.
 
@@ -46,24 +48,33 @@ def oim_send_alert(
             of. This is also referred to as the Auth Token in the BigPanda UI.
         properties: A dict of values that will be sent in the body of the alert. Each
             key-value pair will be parsed as a tag on the alert in BigPanda.
-        timestamp: An optional datetime for the alert. If excluded, BigPanda will use
-            the datetime when it receives the alert payload. ISO 8601 format is
-            recommended, and UTC will be assumed as the timezone if not specified.
+        status: One of "ok", "critical", "warning", or "acknowledged".
+        timestamp: An optional string containing a datetime for the alert. If excluded,
+            BigPanda will use the datetime when it receives the alert payload. ISO 8601
+            format is recommended, and UTC will be assumed as the timezone if not
+            specified.
 
     Raises:
-        BigPandaAPIException: This shouldn't error unless you provide malformed input.
+        ValueError: An incorrect argument was provided.
+        BigPandaAPIException: Something went wrong when connecting to the BigPanda API.
     """
     valid_statuses = {"ok", "critical", "warning", "acknowledged"}
     if status not in valid_statuses:
         raise ValueError("Status must be one of %r." % valid_statuses)
 
-    body = {
+    class AlertBody(TypedDict):
+        app_key: str
+        status: str
+        timestamp: NotRequired[float]
+
+    main_body: AlertBody = {
         "app_key": app_key,
         "status": status,
     }
-    body = {**body, **properties}
+    combined_body = {**main_body, **properties}
     if timestamp:
-        body["timestamp"] = dateutilparser.parse(timestamp).timestamp()
+        timestamp_datetime = parser.parse(timestamp)
+        combined_body["timestamp"] = timestamp_datetime.timestamp()
 
     print("Sending OIM alert...")
     bp_session = requests.Session()
@@ -72,7 +83,7 @@ def oim_send_alert(
     bp_session.headers.update({"Authorization": f"Bearer {org_token}"})
 
     try:
-        bp_session.post(f"{__base_uri}/alerts", data=json.dumps(body))
+        bp_session.post(f"{__base_uri}/alerts", data=json.dumps(combined_body))
     except requests.RequestException as exc:
         raise BigPandaAPIException("Sending alert failed.") from exc
     print("Done!")
