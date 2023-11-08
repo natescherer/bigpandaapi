@@ -1,6 +1,8 @@
 {
   "name": "sre-devcontainer",
-  "image": "ghcr.io/natescherer/sre-devcontainer:latest",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
   "remoteUser": "vscode",
   "features": {},
   "customizations": {

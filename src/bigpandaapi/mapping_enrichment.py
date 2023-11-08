@@ -105,7 +105,7 @@ def mapping_create_schema(
             to the value of 'result_tag'.
 
     Raises:
-        BigPandaAPIException: This shouldn't error unless you provide malformed input.
+        BigPandaAPIException: BigPanda's API returned an error.
     """
     if enrichment_name is None:
         enrichment_name = result_tag
