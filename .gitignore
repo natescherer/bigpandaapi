@@ -12,3 +12,4 @@ __pycache__/
 # Custom Additions
 .tool-versions
 .venv*
+test.py
