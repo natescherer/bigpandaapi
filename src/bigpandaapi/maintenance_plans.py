@@ -212,3 +212,32 @@ def maintenance_plan_delete(api_key: str, id: str):
         bp_session.delete(f"{__base_uri}/maintenance-plans/{id}")
     except requests.RequestException as exc:
         raise BigPandaAPIException("Deleting maintenance plan failed.") from exc
+
+
+def maintenance_plan_stop(api_key: str, id: str):
+    """Stops a BigPanda maintenance plan.
+
+    Stops an active BigPanda maintenance plan while leaving a record of it in the
+    UI/API. You can also use maintenance_plan_delete to stop and delete the record of
+    an active plan in one step.
+
+    Args:
+        id: String of a plan ID to be stopped. Note that stopping via name is
+            intentionally not provided as maintenance plan names in BigPanda are not
+            forced to be unique. If you need to look up a plan ID, use the
+            maintenance_plan_get function.
+        api_key: An API key to authenticate to the BigPanda API.
+
+    Raises:
+        BigPandaAPIException: BigPanda's API returned an error.
+    """
+    print(f"Stopping maintenance plan with id {id!r}...")
+    bp_session = requests.Session()
+    bp_session.hooks = {"response": lambda r, *args, **kwargs: r.raise_for_status()}
+    bp_session.headers.update({"Content-Type": "application/json"})
+    bp_session.headers.update({"Authorization": f"Bearer {api_key}"})
+
+    try:
+        bp_session.post(f"{__base_uri}/maintenance-plans/{id}/stop")
+    except requests.RequestException as exc:
+        raise BigPandaAPIException("Stopping maintenance plan failed.") from exc
