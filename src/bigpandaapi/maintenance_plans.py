@@ -142,7 +142,9 @@ def maintenance_plan_get(
             retrieve just that plan.
         name: Optional string of a regular expression which will be used to filter
             plans based on name. Providing this will cause the function to only return
-            plans that match the provided regex.
+            plans that match the provided regex. Important caveat: Names of maintenance
+            plans are NOT required to be unique in BigPanda, so you can't be sure that
+            a search for a static string will only return one plan.
         only_active: If set to True, will only return active maintenace plans instead
             of plans with any status.
         api_key: An API key to authenticate to the BigPanda API.
@@ -171,15 +173,42 @@ def maintenance_plan_get(
     except requests.RequestException as exc:
         raise BigPandaAPIException("Getting maintenance plans failed.") from exc
 
-    print(r.url)
     if r.status_code == 204:
         return []
     else:
         plan_list = r.json()
-
         if name:
             plan_list = [item for item in plan_list if name_pattern.match(item["name"])]
         elif id:
             plan_list = [item for item in plan_list if item["id"] == id]
 
         return plan_list
+
+
+def maintenance_plan_delete(api_key: str, id: str):
+    """Deletes a BigPanda maintenance plan.
+
+    Deletes a BigPanda maintenance plan from the UI/API. If the plan is active, it will
+    stop being enforced. You can also use maintenance_plan_stop to stop a plan from
+    being active but maintain a record of the in the UI/API.
+
+    Args:
+        id: String of a plan ID to be deleted. Note that deleting via name is
+            intentionally not provided as maintenance plan names in BigPanda are not
+            forced to be unique. If you need to look up a plan ID, use the
+            maintenance_plan_get function.
+        api_key: An API key to authenticate to the BigPanda API.
+
+    Raises:
+        BigPandaAPIException: BigPanda's API returned an error.
+    """
+    print(f"Deleting maintenance plan with id {id!r}...")
+    bp_session = requests.Session()
+    bp_session.hooks = {"response": lambda r, *args, **kwargs: r.raise_for_status()}
+    bp_session.headers.update({"Content-Type": "application/json"})
+    bp_session.headers.update({"Authorization": f"Bearer {api_key}"})
+
+    try:
+        bp_session.delete(f"{__base_uri}/maintenance-plans/{id}")
+    except requests.RequestException as exc:
+        raise BigPandaAPIException("Deleting maintenance plan failed.") from exc
