@@ -13,6 +13,7 @@ Typical usage example:
 from __future__ import annotations  # TypedDict NotRequired Support for <3.10
 
 import json
+import re
 from datetime import datetime
 from datetime import timezone
 from typing import Any
@@ -38,7 +39,7 @@ def maintenance_plan_create(  # noqa: C901
     end_time: str | None = None,
     end_time_delta: str | None = None,
 ) -> None:
-    """Creates a BigPanda Maintenance Plan.
+    """Creates a BigPanda maintenance plan.
 
     Takes input values defining (at least) a condition and schedule for a BigPanda
     maintenance plan and creates it.
@@ -124,3 +125,61 @@ def maintenance_plan_create(  # noqa: C901
         bp_session.post(f"{__base_uri}/maintenance-plans", data=json.dumps(body))
     except requests.RequestException as exc:
         raise BigPandaAPIException("Creating maintenance plan failed.") from exc
+
+
+def maintenance_plan_get(
+    api_key: str,
+    id: str | None = None,
+    only_active: bool = False,
+    name: str | None = None,
+):
+    """Gets all BigPanda maintenance plans.
+
+    Returns all BigPanda maintenance plans that the provided api_key has access to.
+
+    Args:
+        id: Optional string of a plan ID, which will cause this function to
+            retrieve just that plan.
+        name: Optional string of a regular expression which will be used to filter
+            plans based on name. Providing this will cause the function to only return
+            plans that match the provided regex.
+        only_active: If set to True, will only return active maintenace plans instead
+            of plans with any status.
+        api_key: An API key to authenticate to the BigPanda API.
+
+    Returns:
+        list: A list of dicts representing the JSON data returned by BigPanda's API.
+
+    Raises:
+        ValueError: An incorrect argument was provided.
+        BigPandaAPIException: BigPanda's API returned an error.
+    """
+    if name:
+        try:
+            name_pattern = re.compile(name)
+        except re.error as exc:
+            raise ValueError("Unable to compile 'name' into a regex.") from exc
+
+    print("Getting maintenance plans...")
+    bp_session = requests.Session()
+    bp_session.hooks = {"response": lambda r, *args, **kwargs: r.raise_for_status()}
+    bp_session.headers.update({"Content-Type": "application/json"})
+    bp_session.headers.update({"Authorization": f"Bearer {api_key}"})
+
+    try:
+        r = bp_session.get(f"{__base_uri}/maintenance-plans?active={only_active}")
+    except requests.RequestException as exc:
+        raise BigPandaAPIException("Getting maintenance plans failed.") from exc
+
+    print(r.url)
+    if r.status_code == 204:
+        return []
+    else:
+        plan_list = r.json()
+
+        if name:
+            plan_list = [item for item in plan_list if name_pattern.match(item["name"])]
+        elif id:
+            plan_list = [item for item in plan_list if item["id"] == id]
+
+        return plan_list
