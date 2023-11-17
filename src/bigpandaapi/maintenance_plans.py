@@ -64,6 +64,9 @@ def maintenance_plan_create(  # noqa: C901
         description: An optional string describing the maintenance plan that will be
             shown in the BigPanda UI.
 
+    Returns:
+        list: A list of dicts representing the JSON data returned by BigPanda's API.
+
     Raises:
         ValueError: An incorrect argument or combination of arguments was provided.
         BigPandaAPIException: BigPanda's API returned an error.
@@ -119,12 +122,12 @@ def maintenance_plan_create(  # noqa: C901
     bp_session.headers.update({"Content-Type": "application/json"})
     bp_session.headers.update({"Authorization": f"Bearer {api_key}"})
 
-    print(json.dumps(body))
-
     try:
-        bp_session.post(f"{__base_uri}/maintenance-plans", data=json.dumps(body))
+        r = bp_session.post(f"{__base_uri}/maintenance-plans", data=json.dumps(body))
     except requests.RequestException as exc:
         raise BigPandaAPIException("Creating maintenance plan failed.") from exc
+
+    return r.json()
 
 
 def maintenance_plan_get(
