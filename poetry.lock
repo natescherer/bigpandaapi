@@ -650,6 +650,17 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "jsonalias"
+version = "0.1.2"
+description = "A microlibrary that defines a Json type alias for Python."
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "jsonalias-0.1.2-py3-none-any.whl", hash = "sha256:0dece9b199f6aa9a6a2dcfa81d233f5673a9227b66ab16425c39eebf4b45bb94"},
+    {file = "jsonalias-0.1.2.tar.gz", hash = "sha256:e397874a4a13b45c500565703dc71bd42011efde0570246de7a92d284610ac4c"},
+]
+
+[[package]]
 name = "livereload"
 version = "2.6.3"
 description = "Python LiveReload is an awesome tool for web developers"
@@ -1774,4 +1785,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "264fe844391887536a5017befff4d4e0921a616069dcf15fe85ddb51026f3841"
+content-hash = "ad922815b1b57dcd24ec7008cc2cf9554e60e15b99143773c4cc40c6034dadcd"

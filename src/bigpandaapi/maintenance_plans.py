@@ -21,6 +21,7 @@ from typing import Any
 import dateutil
 import pytimeparse2  # type: ignore
 import requests
+from jsonalias import Json
 from typing_extensions import NotRequired  # TypedDict NotRequired Support for <3.11
 from typing_extensions import TypedDict  # TypedDict NotRequired Support for <3.11
 
@@ -38,7 +39,7 @@ def maintenance_plan_create(  # noqa: C901
     start_time: str | None = None,
     end_time: str | None = None,
     end_time_delta: str | None = None,
-) -> None:
+) -> Json:
     """Creates a BigPanda maintenance plan.
 
     Takes input values defining (at least) a condition and schedule for a BigPanda
@@ -65,7 +66,7 @@ def maintenance_plan_create(  # noqa: C901
             shown in the BigPanda UI.
 
     Returns:
-        list: A list of dicts representing the JSON data returned by BigPanda's API.
+        Json: A list of dicts representing the JSON data returned by BigPanda's API.
 
     Raises:
         ValueError: An incorrect argument or combination of arguments was provided.
@@ -127,7 +128,8 @@ def maintenance_plan_create(  # noqa: C901
     except requests.RequestException as exc:
         raise BigPandaAPIException("Creating maintenance plan failed.") from exc
 
-    return r.json()
+    return_data: Json = r.json()
+    return return_data
 
 
 def maintenance_plan_get(
@@ -135,7 +137,7 @@ def maintenance_plan_get(
     id: str | None = None,
     only_active: bool = False,
     name: str | None = None,
-):
+) -> Json:
     """Gets all BigPanda maintenance plans.
 
     Returns all BigPanda maintenance plans that the provided api_key has access to.
@@ -153,7 +155,7 @@ def maintenance_plan_get(
         api_key: An API key to authenticate to the BigPanda API.
 
     Returns:
-        list: A list of dicts representing the JSON data returned by BigPanda's API.
+        Json: A list of dicts representing the JSON data returned by BigPanda's API.
 
     Raises:
         ValueError: An incorrect argument was provided.
@@ -180,15 +182,18 @@ def maintenance_plan_get(
         return []
     else:
         plan_list = r.json()
+        return_data: Json
         if name:
-            plan_list = [item for item in plan_list if name_pattern.match(item["name"])]
+            return_data = [
+                item for item in plan_list if name_pattern.match(item["name"])
+            ]
         elif id:
-            plan_list = [item for item in plan_list if item["id"] == id]
+            return_data = [item for item in plan_list if item["id"] == id]
 
-        return plan_list
+        return return_data
 
 
-def maintenance_plan_delete(api_key: str, id: str):
+def maintenance_plan_delete(api_key: str, id: str) -> None:
     """Deletes a BigPanda maintenance plan.
 
     Deletes a BigPanda maintenance plan from the UI/API. If the plan is active, it will
@@ -217,7 +222,7 @@ def maintenance_plan_delete(api_key: str, id: str):
         raise BigPandaAPIException("Deleting maintenance plan failed.") from exc
 
 
-def maintenance_plan_stop(api_key: str, id: str):
+def maintenance_plan_stop(api_key: str, id: str) -> None:
     """Stops a BigPanda maintenance plan.
 
     Stops an active BigPanda maintenance plan while leaving a record of it in the
