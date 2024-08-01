@@ -4,25 +4,37 @@ updates:
     directory: "/"
     schedule:
       interval: monthly
-    open-pull-requests-limit: 100
+    groups:
+      github-actions:
+        patterns:
+          - .*
   - package-ecosystem: pip
     directory: "/.github/workflows"
     schedule:
       interval: monthly
     allow:
       - dependency-type: "all"
-    open-pull-requests-limit: 100
+    groups:
+      python-workflows:
+        patterns:
+          - .*
   - package-ecosystem: pip
     directory: "/docs"
     schedule:
       interval: monthly
     allow:
       - dependency-type: "all"
-    open-pull-requests-limit: 100
+    groups:
+      python-docs:
+        patterns:
+          - .*
   - package-ecosystem: pip
     directory: "/"
     schedule:
       interval: monthly
     allow:
       - dependency-type: "all"
-    open-pull-requests-limit: 100
+    groups:
+      python:
+        patterns:
+          - .*
