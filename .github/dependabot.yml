@@ -27,7 +27,7 @@ updates:
     groups:
       python-docs:
         patterns:
-          - ."*"
+          - "*"
   - package-ecosystem: pip
     directory: "/"
     schedule:
