@@ -51,7 +51,7 @@ def mapping_update_table(
         BigPandaAPIException: BigPanda's API returned an error.
     """
     # Validate input
-    if [csv_path, list_of_dicts].count(None) != 2:
+    if [csv_path, list_of_dicts].count(None) == 0:
         raise TypeError("The arguments 'csv_path' and 'list_of_dicts' "
                         "are mutually exclusive.")
     if [csv_path, list_of_dicts].count(None) == 2:
