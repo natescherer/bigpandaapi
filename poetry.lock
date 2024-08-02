@@ -1688,6 +1688,7 @@ files = [
     {file = "shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de"},
 ]
 
+
 [[package]]
 name = "six"
 version = "1.16.0"
