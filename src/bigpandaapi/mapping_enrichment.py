@@ -19,6 +19,7 @@ from typing import Optional
 import requests
 
 from .exceptions import BigPandaAPIException
+from .private import _extract_enrichment_name_from_csv
 from .private import _list_of_dicts_to_csv_str
 
 
@@ -26,8 +27,10 @@ __base_uri: str = "https://api.bigpanda.io/resources/v2.1"
 
 
 def mapping_update_table(
-    input_list: List[Dict[str, str]],
-    enrichment_name: str,
+    *,
+    csv_path: str=None,
+    list_of_dicts: List[Dict[str, str]]=None,
+    enrichment_name: str=None,
     api_key: str,
 ) -> None:
     """Updates a BigPanda Mapping Enrichment Table.
@@ -36,7 +39,9 @@ def mapping_update_table(
     table. The table's schema must have already been defined at BigPanda.
 
     Args:
-        input_list: A list of dictionaries containing the data to add to the
+        csv_path: The path to a csv file containing the data to add to 
+            the table.
+        list_of_dicts: A list of dictionaries containing the data to add to the
             table.
         enrichment_name: The name of the enrichment, which must have been
             already defined at BigPanda.
@@ -45,6 +50,28 @@ def mapping_update_table(
     Raises:
         BigPandaAPIException: BigPanda's API returned an error.
     """
+    # Validate input
+    if [csv_path, list_of_dicts].count(None) != 2:
+        raise TypeError("The arguments 'csv_path' and 'list_of_dicts' "
+                        "are mutually exclusive.")
+    if [csv_path, list_of_dicts].count(None) == 2:
+        raise TypeError("Either argument 'csv_path' or 'list_of_dicts' "
+                        "must be set.")
+    if list_of_dicts and not enrichment_name:
+        raise TypeError("Argument 'list_of_dicts' requires that argument "
+                        "'enrichment_name' also be set.")
+
+    # Set enrichment_name if using csv_path
+    if csv_path:
+        enrichment_name = _extract_enrichment_name_from_csv(csv_path)
+
+    # Prepare string to upload
+    if csv_path:
+        with open(csv_path, encoding="UTF-8") as f:
+            csv_string = f.read()
+    elif list_of_dicts:
+        csv_string = _list_of_dicts_to_csv_str(list_of_dicts).encode("UTF-8")
+
     # Construct session
     bp_session = requests.Session()
     bp_session.hooks = {"response": lambda r, *args, **kwargs: r.raise_for_status()}
@@ -65,7 +92,7 @@ def mapping_update_table(
     r_upload = bp_session.post(
         f"{__base_uri}/mapping-enrichment/{mapping_id}/map",
         headers={"Content-Type": "text/csv; charset=utf8"},
-        data=_list_of_dicts_to_csv_str(input_list).encode("UTF-8"),
+        data=csv_string,
     )
     try:
         job_id = r_upload.json()["job_id"]
