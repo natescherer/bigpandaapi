@@ -68,7 +68,11 @@ def mapping_update_table(
     # Prepare string to upload
     if csv_path:
         with open(csv_path, encoding="UTF-8") as f:
+            print(f"Extracting data from file '{csv_path}'...")
             csv_string = f.read()
+            print("Below data was extracted:")
+            print(csv_string)
+            print("")
     elif list_of_dicts:
         csv_string = _list_of_dicts_to_csv_str(list_of_dicts).encode("UTF-8")
 
